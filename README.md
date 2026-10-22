@@ -60,8 +60,3 @@ A modern, community-driven skill sharing platform built with Django, Tailwind CS
    Open `http://127.0.0.1:8000/` in your browser.
 
 ---
-
-## Default Demo Credentials
-
-- **Username:** `harshil` | **Password:** `1234`
-- **Username:** `yash` | **Password:** `1234`
