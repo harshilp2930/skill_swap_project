@@ -1,0 +1,328 @@
+{% extends 'base.html' %} {% block title %}Skill Listings - Skill Swap Hub{% endblock %} {% block content %}
+<div class="relative min-h-screen md:flex">
+  <!-- Mobile menu button -->
+  <div
+    class="md:hidden flex justify-between items-center bg-white p-4 shadow-md"
+  >
+    <a href="{% url 'index' %}" class="text-2xl font-bold text-[#4f46e5]"
+      ><i class="fas fa-people-arrows mr-2"></i> SSH</a
+    >
+    <button id="mobile-menu-button" class="text-gray-500 focus:outline-none">
+      <i class="fas fa-bars text-2xl"></i>
+    </button>
+  </div>
+
+  <!-- Sidebar -->
+  <div
+    id="sidebar"
+    class="sidebar bg-white sidebar-closed md:flex md:flex-col md:justify-between shadow-lg z-30"
+  >
+    <div>
+      <!-- Logo Section -->
+      <div class="logo-section">
+        <a
+          href="{% url 'index' %}"
+          class="sidebar-logo-link inline-flex flex-col items-center justify-center w-full"
+        >
+          <i class="fas fa-people-arrows text-4xl text-[#4f46e5]"></i>
+          <span class="sidebar-text block text-xl font-bold text-[#4f46e5] mt-2"
+            >Skill Swap Hub</span
+          >
+        </a>
+      </div>
+      <!-- Navigation -->
+      <nav class="mt-4 px-4">
+        <a href="{% url 'dashboard' %}" class="sidebar-nav-link"
+          ><i class="fas fa-tachometer-alt fa-fw"></i>
+          <span class="sidebar-text ml-3">Dashboard</span></a
+        >
+        <a href="{% url 'add_skill' %}" class="sidebar-nav-link"
+          ><i class="fas fa-plus-circle fa-fw"></i>
+          <span class="sidebar-text ml-3">Add Skill</span></a
+        >
+        <a href="{% url 'listings' %}" class="sidebar-nav-link active"
+          ><i class="fas fa-list-alt fa-fw"></i>
+          <span class="sidebar-text ml-3">All Skills</span></a
+        >
+        <a href="{% url 'profile' %}" class="sidebar-nav-link"
+          ><i class="fas fa-user fa-fw"></i>
+          <span class="sidebar-text ml-3">My Profile</span></a
+        >
+      </nav>
+    </div>
+    <!-- Toggle & Logout Buttons -->
+    <div class="p-4">
+      <button
+        id="desktop-sidebar-toggle"
+        class="hidden md:block w-full text-center p-2 bg-gray-100 hover:bg-gray-200 rounded-lg mb-2 text-[#4f46e5]"
+      >
+        <i class="fas fa-angle-left transition-transform duration-300"></i>
+      </button>
+      <a href="{% url 'logout' %}" class="sidebar-nav-link"
+        ><i class="fas fa-sign-out-alt fa-fw"></i>
+        <span class="sidebar-text ml-3">Logout</span></a
+      >
+    </div>
+  </div>
+
+  <!-- Main content with adjusted padding -->
+  <main id="main-content" class="flex-1 py-6 px-8 md:py-10 md:px-12">
+    <h1 class="text-3xl font-bold mb-8" id="skills-heading">
+      Explore All Skills
+    </h1>
+    <div
+      class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center"
+    >
+      <div class="flex items-center mb-4 sm:mb-0">
+        <span class="font-semibold mr-2">Show skills:</span>
+        <div class="inline-flex rounded-lg shadow-sm border border-gray-200 bg-white p-0.5">
+          <button
+            id="offer-btn"
+            class="rounded-md px-4 py-1.5 text-sm font-medium transition-all duration-200 bg-indigo-500 text-white shadow-sm"
+          >
+            Offering
+          </button>
+          <button
+            id="request-btn"
+            class="rounded-md px-4 py-1.5 text-sm font-medium transition-all duration-200 text-gray-700 hover:text-gray-900"
+          >
+            Requesting
+          </button>
+        </div>
+      </div>
+      <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
+        <form
+          method="get"
+          action="{% url 'listings' %}"
+          class="relative w-full sm:w-auto"
+        >
+          <input
+            type="text"
+            name="q"
+            id="searchInput"
+            class="border rounded px-3 py-2 pl-10 w-full"
+            placeholder="Search skills..."
+            value="{{ query|default:'' }}"
+          />
+          <button
+            type="submit"
+            class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 focus:outline-none"
+          >
+            <i class="fas fa-search"></i>
+          </button>
+        </form>
+        <div class="relative w-full sm:w-auto">
+          <select id="sort-by" class="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
+            <option value="recent">Recently Added</option>
+            <option value="popular">Most Popular (Not Implemented)</option>
+          </select>
+          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+            <i class="fas fa-chevron-down"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
+      id="skillsGrid"
+    >
+      {% for skill in skills %}
+      <div
+        class="bg-white rounded-xl shadow-md overflow-hidden skill-card flex flex-col"
+        data-type="{{ skill.skill_type }}"
+      >
+        <div class="p-6 flex-grow">
+          <div class="mb-2">
+            {% if skill.skill_type == 'offer' %}
+            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full inline-block">Offering</span>
+            {% else %}
+            <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full inline-block">Requesting</span>
+            {% endif %}
+          </div>
+          <h2 class="text-xl font-bold text-gray-800 mb-2">
+            {{ skill.title }}
+          </h2>
+          <p class="text-gray-600">{{ skill.description }}</p>
+          <div class="mt-4 flex items-center text-gray-700 text-sm">
+            <i class="fas fa-user-circle mr-2 text-lg"></i>
+            <span>Offered by {{ skill.user.username }}</span>
+          </div>
+        </div>
+        <div class="p-6 pt-0">
+          <button
+            class="w-full btn-primary text-white py-2 rounded-lg font-semibold contact-btn"
+            data-username="{{ skill.user.username }}"
+            data-email="{{ skill.user.email }}"
+          >
+            Contact User
+          </button>
+        </div>
+      </div>
+      {% empty %}
+      <p class="text-gray-500">No skills have been posted yet.</p>
+      {% endfor %}
+    </div>
+
+    <!-- Contact Modal -->
+    <div id="contact-modal" class="fixed inset-0 hidden z-50 modal-container flex items-center justify-center p-4">
+      <!-- Modal Backdrop -->
+      <div class="fixed inset-0 modal-backdrop"></div>
+
+      <!-- Modal Content -->
+      <div class="bg-white rounded-xl shadow-2xl w-full max-w-md relative z-10 modal-box overflow-hidden">
+        <!-- Close Button -->
+        <button
+          class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors"
+          id="close-modal"
+          aria-label="Close"
+        >
+          <i class="fas fa-times text-lg"></i>
+        </button>
+
+        <!-- Modal Header -->
+        <div class="p-6 border-b border-gray-100">
+          <h2 class="text-2xl font-bold text-gray-800">
+            Contact Information
+          </h2>
+          <p class="text-gray-500 mt-1 text-sm">
+            You can reach out to this user via:
+          </p>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="p-6 space-y-4">
+          <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+            <div
+              class="flex-shrink-0 w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-[#4f46e5]"
+            >
+              <i class="fas fa-user"></i>
+            </div>
+            <div class="ml-4">
+              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Username</p>
+              <p
+                class="text-base font-semibold text-gray-900"
+                id="modal-username"
+              ></p>
+            </div>
+          </div>
+
+          <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+            <div
+              class="flex-shrink-0 w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-[#4f46e5]"
+            >
+              <i class="fas fa-envelope"></i>
+            </div>
+            <div class="ml-4">
+              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Email</p>
+              <p
+                class="text-base font-semibold text-gray-900"
+                id="modal-email"
+              ></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end">
+          <button
+            id="close-modal-btn"
+            class="btn-primary text-white px-6 py-2 rounded-lg font-medium"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const offerBtn = document.getElementById("offer-btn");
+      const requestBtn = document.getElementById("request-btn");
+      const skillsGrid = document.getElementById("skillsGrid");
+      const skillCards = skillsGrid.querySelectorAll(".skill-card");
+      const noSkillsMessage = skillsGrid.querySelector(".text-gray-500");
+      const skillsHeading = document.getElementById("skills-heading");
+      const sortBySelect = document.getElementById("sort-by");
+
+      function updateSkillsDisplay() {
+        const currentUrl = new URL(window.location.href);
+        const selectedType = offerBtn.classList.contains("bg-indigo-500") ? "offer" : "request";
+        const currentSortBy = sortBySelect.value;
+
+        // Update URL parameters for filtering and sorting
+        currentUrl.searchParams.set('skill_type', selectedType);
+        currentUrl.searchParams.set('sort_by', currentSortBy);
+        window.history.pushState({}, '', currentUrl);
+
+        const selectedTypeText = selectedType === "offer" ? "Offering" : "Requesting";
+        skillsHeading.textContent = `Explore Skills: ${selectedTypeText}`;
+        
+        let visibleSkills = 0;
+        skillCards.forEach(function (card) {
+          const cardType = card.getAttribute("data-type");
+          const typeMatch = cardType === selectedType;
+
+          if (typeMatch) {
+            card.style.display = "flex";
+            card.style.flexDirection = "column";
+            card.classList.remove("fade-in");
+            void card.offsetWidth; // Trigger reflow for smooth re-animation
+            card.classList.add("fade-in");
+            visibleSkills++;
+          } else {
+            card.style.display = "none";
+            card.classList.remove("fade-in");
+          }
+        });
+
+        if (noSkillsMessage) {
+          if (visibleSkills === 0) {
+            noSkillsMessage.textContent = "No skills match your criteria.";
+            noSkillsMessage.style.display = "block";
+          } else {
+            noSkillsMessage.style.display = "none";
+          }
+        }
+      }
+
+      offerBtn.addEventListener("click", function () {
+        offerBtn.className = "rounded-md px-4 py-1.5 text-sm font-medium transition-all duration-200 bg-indigo-500 text-white shadow-sm";
+        requestBtn.className = "rounded-md px-4 py-1.5 text-sm font-medium transition-all duration-200 text-gray-700 hover:text-gray-900";
+        updateSkillsDisplay();
+      });
+
+      requestBtn.addEventListener("click", function () {
+        requestBtn.className = "rounded-md px-4 py-1.5 text-sm font-medium transition-all duration-200 bg-indigo-500 text-white shadow-sm";
+        offerBtn.className = "rounded-md px-4 py-1.5 text-sm font-medium transition-all duration-200 text-gray-700 hover:text-gray-900";
+        updateSkillsDisplay();
+      });
+
+      sortBySelect.addEventListener("change", function() {
+        const form = document.querySelector('form[action="{% url "listings" %}"]');
+        const sortByInput = document.createElement('input');
+        sortByInput.type = 'hidden';
+        sortByInput.name = 'sort_by';
+        sortByInput.value = this.value;
+        form.appendChild(sortByInput);
+        form.submit();
+      });
+
+      // Initial filter and sort on page load
+      window.addEventListener("DOMContentLoaded", function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const initialType = urlParams.get('skill_type') || 'offer';
+        const initialSortBy = urlParams.get('sort_by') || 'recent';
+
+        if (initialType === 'offer') {
+          offerBtn.className = "rounded-md px-4 py-1.5 text-sm font-medium transition-all duration-200 bg-indigo-500 text-white shadow-sm";
+          requestBtn.className = "rounded-md px-4 py-1.5 text-sm font-medium transition-all duration-200 text-gray-700 hover:text-gray-900";
+        } else {
+          requestBtn.className = "rounded-md px-4 py-1.5 text-sm font-medium transition-all duration-200 bg-indigo-500 text-white shadow-sm";
+          offerBtn.className = "rounded-md px-4 py-1.5 text-sm font-medium transition-all duration-200 text-gray-700 hover:text-gray-900";
+        }
+        sortBySelect.value = initialSortBy;
+        updateSkillsDisplay();
+      });
+    </script>
+  </main>
+</div>
+{% endblock %}

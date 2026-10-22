@@ -1,0 +1,88 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Skill Swap Hub{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <style>
+      /* Smooth Page Transitions */
+      body {
+        opacity: 0;
+        transition: opacity 0.16s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      body.page-loaded {
+        opacity: 1;
+      }
+      body.page-leaving {
+        opacity: 0;
+        transition: opacity 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      /* Critical CSS for sidebar to prevent flickering */
+      .sidebar {
+        width: 15rem;
+        visibility: hidden; /* Hide initially */
+        opacity: 0;
+      }
+      .sidebar.sidebar-ready {
+        visibility: visible;
+        opacity: 1;
+        transition: width 0.3s ease-in-out, opacity 0.2s ease-in-out;
+      }
+      .sidebar-collapsed {
+        width: 5rem;
+      }
+      .sidebar-text {
+        opacity: 1;
+        transition: opacity 0.2s ease-in-out;
+      }
+      .sidebar-collapsed .sidebar-text {
+        opacity: 0;
+        display: none;
+      }
+      main#main-content {
+        margin-left: 1rem;
+        transition: margin-left 0.3s ease-in-out;
+      }
+    </style>
+    <script>
+      (function() {
+        function revealPage() {
+          if (document.body) {
+            document.body.classList.remove('page-leaving');
+            document.body.classList.add('page-loaded');
+          }
+        }
+        if (document.readyState === 'interactive' || document.readyState === 'complete') {
+          revealPage();
+        } else {
+          document.addEventListener('DOMContentLoaded', revealPage);
+        }
+        window.addEventListener('pageshow', revealPage);
+      })();
+    </script>
+    <noscript>
+      <style>
+        body { opacity: 1 !important; }
+      </style>
+    </noscript>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+  </head>
+  <body class="antialiased bg-gray-50">
+    {% block content %} {% endblock %}
+
+    <script src="{% static 'js/main.js' %}"></script>
+  </body>
+</html>

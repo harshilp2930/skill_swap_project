@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Edit Skill - Skill Swap Hub{% endblock %}
+
+{% block content %}
+<div class="relative min-h-screen md:flex">
+    <!-- Mobile menu button -->
+    <div class="md:hidden flex justify-between items-center bg-white p-4 shadow-md">
+        <a href="{% url 'index' %}" class="text-2xl font-bold text-[#4f46e5]"><i class="fas fa-people-arrows mr-2"></i> SSH</a>
+        <button id="mobile-menu-button" class="text-gray-500 focus:outline-none"><i class="fas fa-bars text-2xl"></i></button>
+    </div>
+    
+    <!-- **** FINAL POLISHED SIDEBAR **** -->
+    <div id="sidebar" class="sidebar bg-white absolute inset-y-0 left-0 transform md:relative md:translate-x-0 sidebar-closed md:flex md:flex-col md:justify-between shadow-lg z-30">
+        <div>
+            <!-- Logo Section -->
+            <div class="logo-section">
+                <a href="{% url 'index' %}" class="sidebar-logo-link inline-flex flex-col items-center justify-center w-full">
+                    <i class="fas fa-people-arrows text-4xl text-[#4f46e5]"></i>
+                    <span class="sidebar-text block text-xl font-bold text-[#4f46e5] mt-2">Skill Swap Hub</span>
+                </a>
+            </div>
+            <!-- Navigation -->
+            <nav class="mt-4 px-4">
+                <a href="{% url 'dashboard' %}" class="sidebar-nav-link"><i class="fas fa-tachometer-alt fa-fw"></i> <span class="sidebar-text ml-3">Dashboard</span></a>
+                <a href="{% url 'add_skill' %}" class="sidebar-nav-link"><i class="fas fa-plus-circle fa-fw"></i> <span class="sidebar-text ml-3">Add Skill</span></a>
+                <a href="{% url 'listings' %}" class="sidebar-nav-link"><i class="fas fa-list-alt fa-fw"></i> <span class="sidebar-text ml-3">All Skills</span></a>
+                <a href="{% url 'profile' %}" class="sidebar-nav-link"><i class="fas fa-user fa-fw"></i> <span class="sidebar-text ml-3">My Profile</span></a>
+            </nav>
+        </div>
+        <!-- Toggle & Logout Buttons -->
+        <div class="p-4">
+            <button id="desktop-sidebar-toggle" class="hidden md:block w-full text-center p-2 bg-gray-100 hover:bg-gray-200 rounded-lg mb-2 text-[#4f46e5]"><i class="fas fa-angle-left transition-transform duration-300"></i></button>
+            <a href="{% url 'logout' %}" class="sidebar-nav-link"><i class="fas fa-sign-out-alt fa-fw"></i> <span class="sidebar-text ml-3">Logout</span></a>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <main id="main-content" class="flex-1 p-6 md:p-10">
+        <h1 class="text-3xl font-bold mb-8">Edit Skill</h1>
+        <div class="bg-white p-8 rounded-xl shadow-md max-w-2xl mx-auto">
+            <form action="{% url 'edit_skill' skill.id %}" method="POST">
+                {% csrf_token %}
+                <div class="relative mb-6">
+                    <input type="text" id="skill_name" name="skill_name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4f46e5]" value="{{ skill.title }}" required>
+                    <label for="skill_name" class="floating-label-prefilled">Skill Name</label>
+                </div>
+                <div class="relative mb-6">
+                    <select id="skill_type" name="skill_type" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4f46e5] appearance-none" required>
+                        <option value="offer" {% if skill.skill_type == 'offer' %}selected{% endif %}>I am offering this skill</option>
+                        <option value="request" {% if skill.skill_type == 'request' %}selected{% endif %}>I am requesting this skill</option>
+                    </select>
+                    <label for="skill_type" class="floating-label-prefilled">Skill Type</label>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"><i class="fas fa-chevron-down"></i></div>
+                </div>
+                <div class="relative mb-8">
+                    <textarea id="description" name="description" rows="5" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4f46e5]" required>{{ skill.description }}</textarea>
+                    <label for="description" class="floating-label-prefilled">Description</label>
+                </div>
+                <button type="submit" class="w-full btn-primary text-white py-3 rounded-lg font-semibold text-lg">Update Skill</button>
+            </form>
+        </div>
+    </main>
+</div>
+{% endblock %}
